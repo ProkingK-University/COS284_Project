@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include "dfa.h"
 
-extern bool simulateDfa(DFA *dfa, const char *inputString);
+bool simulateDfa(DFA *dfa, const char *inputString){
+  return false;
+}
 
 float testDeliverable2()
 {

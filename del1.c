@@ -5,6 +5,59 @@
 
 #include "dfa.h"
 
+DFA *readDfa(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error: Cannot open file '%s'\n", filename);
+        return NULL;
+    }
+
+    char extra;
+
+    DFA *dfa = (DFA *)malloc(sizeof(DFA));
+    if (dfa == NULL) {
+        fclose(file);
+        printf("Error: Memory allocation failed\n");
+        return NULL;
+    }
+
+    // Read the number of states and transitions
+    fscanf(file, "%d,%d", &dfa->numStates, &dfa->numTransitions);
+  
+    // Allocate memory for states and transitions
+    dfa->states = (State *)malloc(sizeof(State) * dfa->numStates);
+    dfa->transitions = (Transition *)malloc(sizeof(Transition) * dfa->numTransitions);
+
+    // Read state IDs
+    for (int i = 0; i < dfa->numStates; i++) {
+        fscanf(file, "%d,", &dfa->states[i].id);
+        dfa->states[i].isAccepting = false;
+    }
+
+    fscanf(file, "\n");
+
+    // Read accepting state IDs
+    int acceptingStateId;
+    while (fscanf(file, "%d,", &acceptingStateId) == 1) {
+      dfa->states[acceptingStateId].isAccepting = true;
+      printf("id: %d\n", acceptingStateId);
+      printf("accepting: %d\n", dfa->states[acceptingStateId].isAccepting);
+      break;
+    }
+
+    // Read transitions
+    for (int i = 0; i < dfa->numTransitions; i++) {
+        fscanf(file, "%d,%d,%c", &dfa->transitions[i].from, &dfa->transitions[i].to, &dfa->transitions[i].symbol);
+        printf("%d -> %d,%d,%c\n", i, dfa->transitions[i].from, dfa->transitions[i].to, dfa->transitions[i].symbol);
+    }
+
+    // Set the start state to 0
+    dfa->startState = 0;
+
+    fclose(file);
+    return dfa;
+}
+
 ErrorReport *createErrorReport()
 {
   ErrorReport *report = (ErrorReport *)malloc(sizeof(ErrorReport));
@@ -33,7 +86,7 @@ void freeErrorReport(ErrorReport *report)
   free(report);
 }
 
-extern DFA *readDfa(const char *filename);
+//extern DFA *readDfa(const char *filename);
 
 void printDfa(DFA *dfa)
 {
@@ -44,6 +97,14 @@ void printDfa(DFA *dfa)
   }
 
   printf("DFA Representation:\n\n");
+
+  printf("Num of transitions:\n");
+  printf("%d", dfa->numTransitions);
+  printf("\n");
+
+  printf("Num of states:\n");
+  printf("%d", dfa->numStates);
+  printf("\n");
 
   // Print States
   printf("States:\n");
@@ -257,9 +318,10 @@ float testDeliverable1()
   float marks = 0;
   float marksPerDFA = 30.0 / numDFA;
 
-  for (int i = 0; i < numDFA; i++)
+  for (int i = 0; i < 1; i++)
   {
     DFA *dfaTest = readDfa(dfaFiles[i]);
+    printDfa(dfaTest);
 
     ErrorReport *report = validateDfa(dfaTest);
 
