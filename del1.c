@@ -12,8 +12,6 @@ DFA *readDfa(const char *filename) {
         return NULL;
     }
 
-    char extra;
-
     DFA *dfa = (DFA *)malloc(sizeof(DFA));
     if (dfa == NULL) {
         fclose(file);
@@ -22,7 +20,11 @@ DFA *readDfa(const char *filename) {
     }
 
     // Read the number of states and transitions
-    fscanf(file, "%d,%d", &dfa->numStates, &dfa->numTransitions);
+    if (fscanf(file, "%d,%d\n", &dfa->numStates, &dfa->numTransitions) != 2)
+    {
+        fclose(file);
+        return NULL; // Incorrect format
+    }
   
     // Allocate memory for states and transitions
     dfa->states = (State *)malloc(sizeof(State) * dfa->numStates);
@@ -38,17 +40,24 @@ DFA *readDfa(const char *filename) {
 
     // Read accepting state IDs
     int acceptingStateId;
-    while (fscanf(file, "%d,", &acceptingStateId) == 1) {
+    int lastSetAcceptingID = -1;
+    while (fscanf(file, "%d", &acceptingStateId) == 1) {
+      if(dfa->states[acceptingStateId].isAccepting || acceptingStateId <= lastSetAcceptingID){
+        fseek(file, -1, SEEK_CUR);
+        break;
+      }
       dfa->states[acceptingStateId].isAccepting = true;
-      printf("id: %d\n", acceptingStateId);
-      printf("accepting: %d\n", dfa->states[acceptingStateId].isAccepting);
-      break;
+      fscanf(file, ",");
+      lastSetAcceptingID = acceptingStateId;
     }
+
+
+    fscanf(file, "\n");
+
 
     // Read transitions
     for (int i = 0; i < dfa->numTransitions; i++) {
         fscanf(file, "%d,%d,%c", &dfa->transitions[i].from, &dfa->transitions[i].to, &dfa->transitions[i].symbol);
-        printf("%d -> %d,%d,%c\n", i, dfa->transitions[i].from, dfa->transitions[i].to, dfa->transitions[i].symbol);
     }
 
     // Set the start state to 0
@@ -318,10 +327,10 @@ float testDeliverable1()
   float marks = 0;
   float marksPerDFA = 30.0 / numDFA;
 
-  for (int i = 0; i < 1; i++)
+  for (int i = 0; i < numDFA; i++)
   {
     DFA *dfaTest = readDfa(dfaFiles[i]);
-    printDfa(dfaTest);
+    //printDfa(dfaTest);
 
     ErrorReport *report = validateDfa(dfaTest);
 
