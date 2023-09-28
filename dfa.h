@@ -1,8 +1,10 @@
 #ifndef DFA_H
 #define DFA_H
 
-#include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 
 // State Structure
 typedef struct
