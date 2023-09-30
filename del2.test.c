@@ -1,4 +1,32 @@
-#include "dfa.h"
+/*#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+// State Structure
+typedef struct
+{
+    int id;
+    bool isAccepting;
+} State;
+
+// Transition Structure
+typedef struct
+{
+    int from;
+    int to;
+    char symbol;
+} Transition;
+
+// DFA Structure
+typedef struct
+{
+    State *states;
+    Transition *transitions;
+    int numStates;
+    int numTransitions;
+    int startState;
+} DFA;
 
 // Function to simulate input string over a DFA
 bool simulateDfa(DFA *dfa, const char *inputString) {
@@ -33,3 +61,4 @@ bool simulateDfa(DFA *dfa, const char *inputString) {
 
     return false; // Input string is not accepted
 }
+*/

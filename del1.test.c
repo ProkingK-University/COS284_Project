@@ -1,4 +1,32 @@
-#include "dfa.h"
+/*#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+// State Structure
+typedef struct
+{
+    int id;
+    bool isAccepting;
+} State;
+
+// Transition Structure
+typedef struct
+{
+    int from;
+    int to;
+    char symbol;
+} Transition;
+
+// DFA Structure
+typedef struct
+{
+    State *states;
+    Transition *transitions;
+    int numStates;
+    int numTransitions;
+    int startState;
+} DFA;
 
 DFA *readDfa(const char *filename){
     FILE *file = fopen(filename, "r");
@@ -20,7 +48,7 @@ DFA *readDfa(const char *filename){
         fclose(file);
         return NULL; // Incorrect format
     }
-  
+
     // Allocate memory for states and transitions
     dfa->states = (State *)malloc(sizeof(State) * dfa->numStates);
     dfa->transitions = (Transition *)malloc(sizeof(Transition) * dfa->numTransitions);
@@ -60,4 +88,4 @@ DFA *readDfa(const char *filename){
 
     fclose(file);
     return dfa;
-}
+}*/
