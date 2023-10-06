@@ -1,5 +1,5 @@
 ASM_SOURCES := $(wildcard src/*.asm *.asm)
-C_TEST_SOURCES := main.c del1.c del2.c del3.c del3.test.c
+C_TEST_SOURCES := main.c del1.c del2.c del3.c
 SRC_DIR := src
 OBJ_DIR := .
 BIN_DIR := .

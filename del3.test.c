@@ -1,124 +1,103 @@
-#include "dfa.h"
+/*#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 
-/*bool containsSymbol(const char* string){
+// State Structure
+typedef struct
+{
+    int id;
+    bool isAccepting;
+} State;
 
+// Transition Structure
+typedef struct
+{
+    int from;
+    int to;
+    char symbol;
+} Transition;
+
+// DFA Structure
+typedef struct
+{
+    State *states;
+    Transition *transitions;
+    int numStates;
+    int numTransitions;
+    int startState;
+} DFA;
+
+// Helper function to check if two states are equivalent
+bool areStatesEquivalent(State state1, State state2)
+{
+    return (state1.isAccepting == state2.isAccepting);
 }
 
-int countNumOfSymbols(const char* symbol_string){
-
-}*/
-
-bool sameLanguage(DFA *dfa1, DFA *dfa2){
-    // Create a new DFA A3 based on the given DFAs dfa1 and dfa2
-    /*DFA *dfa3 = (DFA *)malloc(sizeof(DFA));
-    if (dfa3 == NULL) {
-        printf("Error: Memory allocation failed\n");
-        return false;
+// Helper function to find a transition by source state and symbol in a DFA
+Transition* findTransition(DFA *dfa, int from, char symbol)
+{
+    for (int i = 0; i < dfa->numTransitions; i++)
+    {
+        if (dfa->transitions[i].from == from && dfa->transitions[i].symbol == symbol)
+            return &dfa->transitions[i];
     }
+    return NULL;
+}
 
-    // Initialize the number of states and transitions for A3
-    dfa3->numStates = dfa1->numStates * dfa2->numStates;
-    dfa3->numTransitions = dfa1->numTransitions * dfa2->numTransitions;
+// Main function to check if two DFAs accept the same language
+bool sameLanguage(DFA *dfa1, DFA *dfa2)
+{
+    // Check if both DFAs accept the empty language
+    if (!dfa1->states[dfa1->startState].isAccepting && !dfa2->states[dfa2->startState].isAccepting)
+        return true;
 
-    // Allocate memory for states and transitions in A3
-    dfa3->states = (State *)malloc(sizeof(State) * dfa3->numStates);
-    dfa3->transitions = (Transition *)malloc(sizeof(Transition) * dfa3->numTransitions);
+    // Initialize a table for visited state pairs
+    bool visited[dfa1->numStates][dfa2->numStates];
+    memset(visited, 0, sizeof(visited));
 
-    if (dfa3->states == NULL || dfa3->transitions == NULL) {
-        printf("Error: Memory allocation failed\n");
-        free(dfa3->states);
-        free(dfa3->transitions);
-        free(dfa3);
-        return false;
-    }
+    // Create a queue for BFS
+    int queue1[dfa1->numStates];
+    int queue2[dfa2->numStates];
+    int front1 = 0, rear1 = 0, front2 = 0, rear2 = 0;
 
-    // Create states and transitions for A3 based on dfa1 and dfa2
-    int currentState3 = 0;
-    for (int i = 0; i < dfa1->numStates; i++) {
-        for (int j = 0; j < dfa2->numStates; j++) {
-            dfa3->states[currentState3].id = currentState3;
-            dfa3->states[currentState3].isAccepting = (dfa1->states[i].isAccepting && !dfa2->states[j].isAccepting);
+    // Enqueue initial states
+    queue1[rear1++] = dfa1->startState;
+    queue2[rear2++] = dfa2->startState;
+    visited[dfa1->startState][dfa2->startState] = true;
 
-            for (int k = 0; k < dfa1->numTransitions; k++) {
-                for (int l = 0; l < dfa2->numTransitions; l++) {
-                    dfa3->transitions[currentState3 * dfa1->numTransitions * dfa2->numTransitions + k * dfa2->numTransitions + l].from = currentState3;
-                    dfa3->transitions[currentState3 * dfa1->numTransitions * dfa2->numTransitions + k * dfa2->numTransitions + l].to = i * dfa2->numStates + j;
-                    dfa3->transitions[currentState3 * dfa1->numTransitions * dfa2->numTransitions + k * dfa2->numTransitions + l].symbol = dfa1->transitions[k].symbol;
-                }
-            }
+    while (front1 < rear1 && front2 < rear2)
+    {
+        int state1 = queue1[front1++];
+        int state2 = queue2[front2++];
 
-            currentState3++;
-        }
-    }
-    // Define the initial state and alphabet for A3
-    dfa3->startState = 0;
-
-    // Check reachability from the initial state in A3
-    printf("Error: Got to line 57\n");
-    int *stack = (int *)malloc(dfa3->numStates * sizeof(int));
-    printf("Error: Got to line 59\n");
-    //printf("Num of states: %d\n", dfa3->numStates);
-    //bool *visited = (bool *)malloc(dfa3->numStates * sizeof(bool));
-    unsigned char *visited = (unsigned char *)malloc(dfa3->numStates);
-    printf("Error: Got to line 59\n");
-    if (visited == NULL) {
-        printf("Error: Memory allocation failed\n");
-        free(dfa3->states);
-        free(dfa3->transitions);
-        free(dfa3);
-        return false;
-    }
-
-    // Initialize the visited array to 0 (false) for all elements
-    memset(visited, 0, dfa3->numStates);
-
-    //printf("Error: Got to line 68\n");
-
-    
-    if (stack == NULL) {
-        printf("Error: Memory allocation failed\n");
-        free(dfa3->states);
-        free(dfa3->transitions);
-        free(dfa3);
-        free(visited);
-        return false;
-    }
-
-    int top = 0;
-    stack[top] = dfa3->startState;
-    visited[dfa3->startState] = true;
-
-    while (top >= 0) {
-        int currentState = stack[top--];
-
-        for (int i = 0; i < dfa3->numTransitions; i++) {
-            if (dfa3->transitions[i].from == currentState && !visited[dfa3->transitions[i].to]) {
-                stack[++top] = dfa3->transitions[i].to;
-                visited[dfa3->transitions[i].to] = true;
-            }
-        }
-    }
-
-    // Check if all accepting states in A3 are visited
-    for (int i = 0; i < dfa3->numStates; i++) {
-        if (dfa3->states[i].isAccepting && !visited[i]) {
-            // Free allocated memory and return false
-            printf("Error: Not all accepting states are visited\n");
-            free(dfa3->states);
-            free(dfa3->transitions);
-            free(dfa3);
-            free(visited);
-            free(stack);
+        if (dfa1->states[state1].isAccepting != dfa2->states[state2].isAccepting)
             return false;
+
+        for (char symbol = 'a'; symbol <= 'b'; symbol++)
+        {
+            Transition *transition1 = findTransition(dfa1, state1, symbol);
+            Transition *transition2 = findTransition(dfa2, state2, symbol);
+
+            if (transition1 == NULL && transition2 == NULL)
+                continue;
+
+            if ((transition1 == NULL && transition2 != NULL) || (transition1 != NULL && transition2 == NULL))
+                return false;
+
+            int nextState1 = transition1->to;
+            int nextState2 = transition2->to;
+
+            if (!visited[nextState1][nextState2])
+            {
+                queue1[rear1++] = nextState1;
+                queue2[rear2++] = nextState2;
+                visited[nextState1][nextState2] = true;
+            }
         }
     }
 
-    // Free allocated memory and return true
-    printf("Error: All is well or should be\n");
-    free(dfa3->states);
-    free(dfa3->transitions);
-    free(dfa3);
-    free(visited);
-    free(stack);*/
+    // If we reach here, both DFAs accept the same language
     return true;
 }
+*/
