@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "dfa.h"
 
 extern bool simulateDfa(DFA *dfa, const char *inputString);

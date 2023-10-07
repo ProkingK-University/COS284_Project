@@ -5,6 +5,8 @@
 
 #include "dfa.h"
 
+extern DFA *readDfa(const char *filename);
+
 ErrorReport *createErrorReport()
 {
   ErrorReport *report = (ErrorReport *)malloc(sizeof(ErrorReport));
@@ -33,8 +35,6 @@ void freeErrorReport(ErrorReport *report)
   free(report);
 }
 
-extern DFA *readDfa(const char *filename);
-
 void printDfa(DFA *dfa)
 {
   if (!dfa)
@@ -44,6 +44,14 @@ void printDfa(DFA *dfa)
   }
 
   printf("DFA Representation:\n\n");
+
+  printf("Num of transitions:\n");
+  printf("%d", dfa->numTransitions);
+  printf("\n");
+
+  printf("Num of states:\n");
+  printf("%d", dfa->numStates);
+  printf("\n");
 
   // Print States
   printf("States:\n");
@@ -260,6 +268,7 @@ float testDeliverable1()
   for (int i = 0; i < numDFA; i++)
   {
     DFA *dfaTest = readDfa(dfaFiles[i]);
+    //printDfa(dfaTest);
 
     ErrorReport *report = validateDfa(dfaTest);
 
